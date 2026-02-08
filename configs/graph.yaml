@@ -1,0 +1,69 @@
+# LangGraph workflow configuration with LLM model settings
+# DeepSeek: https://api-docs.deepseek.com/ — deepseek-reasoner is thinking mode of DeepSeek-V3.2
+models:
+  default:
+    provider: deepseek
+    model_name: "deepseek-reasoner"
+    temperature: 0.1
+    max_tokens: 8000
+
+  nodes:
+    input_processing:
+      provider: deepseek
+      model_name: "deepseek-reasoner"
+      temperature: 0.1
+      max_tokens: 2000
+      requires_structured_output: false
+
+    generating_content:
+      provider: deepseek
+      model_name: "deepseek-reasoner"
+      temperature: 0.5
+      max_tokens: 8000
+      requires_structured_output: false
+
+    recognition_handwritten:
+      # OpenAI vision only — images (handwritten notes); DeepSeek chat/reasoner are text-only
+      provider: openai
+      model_name: "gpt-4o-mini"
+      temperature: 0.1
+      max_tokens: 6000
+      requires_structured_output: false
+      requires_vision: true
+
+    synthesis_material:
+      provider: deepseek
+      model_name: "deepseek-reasoner"
+      temperature: 0.5
+      max_tokens: 8000
+      requires_structured_output: false
+
+    generating_questions:
+      # OpenAI required: structured output (Pydantic) not supported for DeepSeek in this codebase
+      provider: openai
+      model_name: "gpt-4o-mini"
+      temperature: 0.0
+      max_tokens: 6000
+      requires_structured_output: true
+
+    answer_question:
+      provider: deepseek
+      model_name: "deepseek-reasoner"
+      temperature: 0.2
+      max_tokens: 8000
+      requires_structured_output: false
+
+    edit_material:
+      # OpenAI required: structured output (Pydantic) not supported for DeepSeek in this codebase
+      provider: openai
+      model_name: "gpt-4o-mini"
+      temperature: 0.2
+      max_tokens: 6000
+      requires_structured_output: true
+
+    security_guard:
+      provider: deepseek
+      model_name: "deepseek-reasoner"
+      temperature: 0.2
+      max_tokens: 6000
+      requires_structured_output: false
