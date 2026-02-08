@@ -4,13 +4,13 @@ A comprehensive microservices-based platform for generating educational material
 
 ## Examples of materials
 Beginner
-https://www.base-library.site/materials/ce416c8d-c944-488e-b8d9-658f803db4ff
+https://www.base-library.site/materials/1144538a-9925-4a10-aa94-6e96cebe024a
 
 Grade: Intermediate
-https://www.base-library.site/materials/273801ab-74a7-470a-b9da-b0df34121d57
+https://www.base-library.site/materials/564949bc-015e-42ae-8cf2-c749aa211f9e
 
 Grade: Advanced
-https://www.base-library.site/materials/2312f0a6-4c42-4682-b456-019f23d12420
+https://www.base-library.site/materials/703d351d-98a2-4f3e-8775-78f943f7055d
 
 ## 🏗️ Architecture Overview
 
@@ -146,11 +146,16 @@ Each node can be configured with different models based on requirements.
 The platform integrates [Opik](https://www.comet.com/docs/opik) for LLM observability and evaluation:
 
 - **Tracing**: All workflow runs and LLM calls are logged as traces and spans (token usage and cost when available).
-- **Offline evaluation**: A small benchmark dataset and metrics (e.g. Hallucination, Answer Relevance) can be run via `scripts/run_opik_evaluation.py`. See [OPIK_Integrate/EVALUATION.md](OPIK_Integrate/EVALUATION.md) and [OPIK_Integrate/QUICK_START.md](OPIK_Integrate/QUICK_START.md).
+- **Offline evaluation**: A small benchmark dataset and metrics (e.g. Hallucination, Answer Relevance)
 
-Set `OPIK_API_KEY`, `OPIK_PROJECT_NAME`, and optionally `OPIK_ENABLED=true` in `.env` to enable tracing.
+More about Opik:
+
+- [docs/backend/architecture/opik.md](../../docs/backend/architecture/opik.md)
+- [docs/architecture/opik-diagrams.md](../../docs/architecture/opik-diagrams.md)
+- [OPIK_Integrate/QUICK_START.md](OPIK_Integrate/QUICK_START.md)
 
 ## 🚀 Services Architecture
+
 
 ### Core AI Service (Port 8000)
 - **Framework**: FastAPI + LangGraph

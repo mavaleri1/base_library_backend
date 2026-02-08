@@ -1,3 +1,0 @@
-# Test images
-
-- **recognition_verification_2025.png** — Used to verify Recognized/Synthesized pipeline (plan `check_recognized_и_synthesized v2`). Contains header "Student Notes — Verification 2025" and Euler's identity: e^(iπ) + 1 = 0. Topic B (Euler) differs from topic A (integration by parts in question) — synthesized_material should merge both. Regenerate with: `python tests/generate_recognition_test_image.py` from repo root.
