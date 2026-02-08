@@ -141,10 +141,7 @@ class GeneralState(BaseModel):
 
 The platform supports multiple LLM providers:
 
-- **OpenAI** (GPT-4, GPT-3.5)
-- **OpenRouter** (Various models)
-- **Fireworks AI**
-- **DeepSeek**
+- **OpenAI-compatible** models (DeepSeek, Gemini, Kimi, etc.)
 
 Each node can be configured with different models based on requirements.
 
@@ -305,13 +302,6 @@ The platform implements sophisticated HITL patterns:
 - `POST /profiles` - Create user profiles
 - `PUT /profiles/{profile_id}` - Update user profiles
 
-## 🔮 Future Enhancements
-
-- Advanced AI model integration
-- Real-time collaboration
-- Advanced analytics and insights
-- Multi-language support
-- Mobile application
 
 ---
 
