@@ -18,13 +18,6 @@ This project implements a sophisticated AI-powered educational platform built on
 
 ### Core Services
 
-```mermaid
-flowchart TB
-    A["Base Library"] --> B["FastAPI"]
-    B --> C["LangGraph Workflow"] & F["PostgreSQL Database"] & G["Opik Tracing"]
-    C --> D["OpenAI API"] & E["Image Recognition"]
-```
-
 1. **Core AI Service** - Main LangGraph workflow orchestrator
 2. **Article Service** - File storage and export management
 3. **Prompt Studio Service** - Dynamic prompt generation and user customization
