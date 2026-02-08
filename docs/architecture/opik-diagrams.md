@@ -16,7 +16,7 @@ graph TB
   end
 
   subgraph "Core Services"
-    CORE[core service (LangGraph)]
+    CORE["core service<br/>(LangGraph)"]
     ARTICLE[article service]
     PROMPT[Prompt Config service]
   end
@@ -84,7 +84,7 @@ sequenceDiagram
 
 ```mermaid
 flowchart TB
-  T[Trace: workflow_execution\n(thread_id)]
+  T["Trace: workflow_execution<br/>(thread_id)"]
 
   subgraph "Per-node spans"
     S1[node_generating_content]
@@ -117,11 +117,11 @@ flowchart TB
 
 ```mermaid
 flowchart LR
-  PROD[Production traffic] --> TR[Opik Traces\nworkflow_execution]
-  TR -->|sampling| RULES[Online Evaluation Rules\n(judge model + metric)]
-  RULES --> RES[Evaluation Results\nscores / labels]
-  RES --> DASH[Dashboards / Alerts]
-  RES --> QA[Quality monitoring\nregressions, drift]
+  PROD[Production traffic] --> TR["Opik Traces<br/>workflow_execution"]
+  TR -->|sampling| RULES["Online Evaluation Rules<br/>(judge model + metric)"]
+  RULES --> RES["Evaluation Results<br/>scores / labels"]
+  RES --> DASH["Dashboards / Alerts"]
+  RES --> QA["Quality monitoring<br/>regressions, drift"]
 ```
 
 ## 5) HITL: user feedback as part of the trace

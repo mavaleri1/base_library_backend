@@ -77,7 +77,7 @@ At the end of the workflow, the trace is updated with `output` so the UI shows a
 - **Artifacts**: `artifacts_save` (which node, success, latency)
 - **HITL feedback**: `hitl_feedback` (preview + full text within limits)
 
-## How Opik helps the team
+## How Opik helps
 
 - **Production debugging**: quickly locate problematic runs by `thread_id`, inspect inputs/outputs, and see where quality dropped or latency spikes occur.
 - **Cost and performance analytics**: tokens/cost/latency per node and per request type.
@@ -95,15 +95,4 @@ Settings come from environment variables (see `Base-Library-Backend/core/config/
 - `OPIK_PROJECT_NAME`: project name (default: `base-library`)
 - `OPIK_API_BASE_URL`: base URL (default: `https://api.opik.com`; when custom, it’s passed as `host`)
 - `OPIK_ENABLED`: `true/false` to enable/disable
-
-Connection check:
-
-- Run `python Base-Library-Backend/test_opik_connection.py`
-- Verify that `test_trace` and `test_span` appear in the Opik UI
-
-## Limitations and security practices
-
-- **Do not send full large materials** into `trace.output`: use a compact `snippet` (up to ~300 chars).
-- **PII/secrets**: only send data to `metadata/input/output` that is safe for an external observability system. If `query` may contain sensitive data, mask/redact it before sending.
-- **Reliability**: Opik errors are logged and must not break the workflow (graceful degradation).
 

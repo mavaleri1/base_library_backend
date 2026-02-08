@@ -18,6 +18,13 @@ This project implements a sophisticated AI-powered educational platform built on
 
 ### Core Services
 
+```mermaid
+flowchart TB
+    A["Base Library"] --> B["FastAPI"]
+    B --> C["LangGraph Workflow"] & F["PostgreSQL Database"] & G["Opik Tracing"]
+    C --> D["OpenAI API"] & E["Image Recognition"]
+```
+
 1. **Core AI Service** - Main LangGraph workflow orchestrator
 2. **Article Service** - File storage and export management
 3. **Prompt Studio Service** - Dynamic prompt generation and user customization
@@ -150,9 +157,8 @@ The platform integrates [Opik](https://www.comet.com/docs/opik) for LLM observab
 
 More about Opik:
 
-- [docs/backend/architecture/opik.md](../../docs/backend/architecture/opik.md)
-- [docs/architecture/opik-diagrams.md](../../docs/architecture/opik-diagrams.md)
-- [OPIK_Integrate/QUICK_START.md](OPIK_Integrate/QUICK_START.md)
+- [docs/backend/architecture/opik.md](https://github.com/mavaleri1/base_library_backend/blob/main/docs/backend/architecture/opik.md)
+- [docs/architecture/opik-diagrams.md](https://github.com/mavaleri1/base_library_backend/blob/main/docs/architecture/opik-diagrams.md)
 
 ## 🚀 Services Architecture
 
