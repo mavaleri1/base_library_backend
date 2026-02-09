@@ -73,6 +73,7 @@ services:
       - ARTIFACTS_CLERK_ISSUER=${ARTIFACTS_CLERK_ISSUER:-}
       - ARTIFACTS_CLERK_AUDIENCE=${ARTIFACTS_CLERK_AUDIENCE:-}
       - ARTIFACTS_CORS_ORIGINS=${CORS_ORIGINS:-http://localhost:5174,http://localhost:3001,http://127.0.0.1:5174,http://127.0.0.1:3000,http://127.0.0.1:3001}
+      - TZ=UTC  # date area
     ports:
       - "8001:8001"
     restart: always

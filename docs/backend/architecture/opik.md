@@ -62,6 +62,9 @@ Created when a new workflow starts:
 - **input** (for the Traces table):
   - `query` (up to 500 chars)
   - `image_count`
+  - `session_id`
+  - (optional) `user_id`
+  - (optional) `user_settings`: dict with `learning_style`, `learning_goal`, `difficulty`, `subject`, `volume` (only non-empty values)
 
 At the end of the workflow, the trace is updated with `output` so the UI shows a meaningful result without opening spans:
 

@@ -609,24 +609,36 @@ class GraphManager:
         if self.opik.is_enabled():
             if not state.values:
                 # Fresh run: create new trace with learning metadata
+                user_settings_keys = ("learning_style", "learning_goal", "difficulty", "subject", "volume")
+                user_settings_filtered = {}
+                if user_settings:
+                    for key in user_settings_keys:
+                        if key in user_settings and user_settings[key] is not None:
+                            user_settings_filtered[key] = user_settings[key]
+
                 trace_metadata = {
                     "query": query[:100] if query else "",
                     "image_count": len(image_paths) if image_paths else 0,
                     "session_id": session_id,
+                    **user_settings_filtered,
                 }
-                if user_settings:
-                    for key in ("learning_style", "difficulty", "learning_goal", "subject", "volume"):
-                        if key in user_settings and user_settings[key] is not None:
-                            trace_metadata[key] = user_settings[key]
+
+                trace_input = {
+                    "query": query[:500] if query else "",
+                    "image_count": len(image_paths) if image_paths else 0,
+                    "session_id": session_id,
+                }
+                if user_id:
+                    trace_input["user_id"] = user_id
+                if user_settings_filtered:
+                    trace_input["user_settings"] = user_settings_filtered
+
                 trace = self.opik.create_trace(
                     name="workflow_execution",
                     thread_id=thread_id,
                     user_id=user_id,
                     metadata=trace_metadata,
-                    input={
-                        "query": query[:500] if query else "",
-                        "image_count": len(image_paths) if image_paths else 0,
-                    },
+                    input=trace_input,
                 )
                 if trace:
                     self.active_traces[thread_id] = trace

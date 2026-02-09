@@ -47,6 +47,7 @@ def verify_clerk_token(token: str) -> dict:
         "algorithms": ["RS256"],
         "issuer": settings.clerk_issuer,
         "options": {"verify_aud": bool(settings.clerk_audience)},
+        "leeway": 120,  
     }
     if settings.clerk_audience:
         decode_kwargs["audience"] = settings.clerk_audience

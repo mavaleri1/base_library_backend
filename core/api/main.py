@@ -300,12 +300,14 @@ async def process_request(
     try:
         logger.info(f"Processing request for thread: {thread_id}, question length: {len(question)}")
         
-        # Parse settings if provided
+        # Parse settings if provided (difficulty, subject, volume not logged and not passed to metadata)
         parsed_settings = None
         if settings:
             try:
                 parsed_settings = json.loads(settings)
-                logger.info(f"Parsed settings: {parsed_settings}")
+                log_safe = {k: v for k, v in parsed_settings.items() if k not in ("difficulty", "subject", "volume")}
+                if log_safe:
+                    logger.info(f"Parsed settings: {log_safe}")
             except json.JSONDecodeError as e:
                 logger.error(f"Failed to parse settings JSON: {e}")
                 raise HTTPException(status_code=400, detail="Invalid settings JSON format")
@@ -358,12 +360,12 @@ async def process_request(
 
         logger.info(f"🔍 [core_API] Processing request with user_id: {user_id}")
         
-        # Build user_settings for Opik trace metadata (learning_style, difficulty, etc.)
+        # Build user_settings for Opik trace metadata (without difficulty, subject, volume)
         user_settings = None
         if parsed_settings:
             user_settings = {
                 k: v for k, v in parsed_settings.items()
-                if k in ("learning_style", "difficulty", "learning_goal", "subject", "volume")
+                if k in ("learning_style", "learning_goal")
             }
             if user_settings:
                 logger.debug(f"User settings for trace: {user_settings}")
