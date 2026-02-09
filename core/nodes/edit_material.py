@@ -17,6 +17,7 @@ from ..core.state import GeneralState, ActionDecision, EditDetails, EditMessageD
 # from ..utils.utils import render_system_prompt
 from ..services.hitl_manager import get_hitl_manager
 from ..services.opik_client import get_opik_client
+from ..config.settings import get_settings
 
 
 class EditMaterialNode(BaseWorkflowNode):
@@ -310,6 +311,26 @@ class EditMaterialNode(BaseWorkflowNode):
         # If not continuing autonomously, set message
         if not action.continue_editing:
             update_dict["agent_message"] = "Edit applied. What other changes are needed?"
+            # #region agent log
+            import json, time
+            try:
+                log_data = {
+                    "runId": "pre-fix",
+                    "hypothesisId": "A",
+                    "location": "edit_material:handle_edit_action",
+                    "message": "agent_message set after edit",
+                    "data": {
+                        "agent_message": update_dict["agent_message"],
+                        "needs_user_input": update_dict["needs_user_input"],
+                        "last_action": update_dict["last_action"]
+                    },
+                    "timestamp": int(time.time() * 1000)
+                }
+                with open(r"d:\GitHub\000.endcode\base_library\.cursor\debug.log", "a", encoding="utf-8") as f:
+                    f.write(json.dumps(log_data, ensure_ascii=False) + "\n")
+            except Exception:
+                pass
+            # #endregion
 
         return Command(goto="edit_material", update=update_dict)
 
@@ -319,12 +340,22 @@ class EditMaterialNode(BaseWorkflowNode):
         """Handle user message"""
         messages.append(AIMessage(content=action.content))
 
+        # Don't set full content as agent_message if it's too long (likely material content, not a message)
+        # Limit agent_message to first 200 characters to avoid showing full material text in modal
+        content_preview = action.content[:200] + "..." if len(action.content) > 200 else action.content
+        
+        # If content looks like material text (long, has markdown headers), use a generic message
+        if len(action.content) > 500 or ("###" in action.content and len(action.content) > 300):
+            agent_msg = "I received your message. Please specify what changes you'd like to make to the material."
+        else:
+            agent_msg = content_preview
+
         return Command(
             goto="edit_material",
             update={
                 "feedback_messages": messages,
                 "needs_user_input": True,
-                "agent_message": action.content,
+                "agent_message": agent_msg,
                 "last_action": "message",
             },
         )
@@ -381,6 +412,26 @@ class EditMaterialNode(BaseWorkflowNode):
         # Request user input if needed
         if state.needs_user_input:
             msg_to_user = state.agent_message or "Which changes to make to the material? "
+            # #region agent log
+            import json, time
+            try:
+                log_data = {
+                    "runId": "pre-fix",
+                    "hypothesisId": "B",
+                    "location": "edit_material:__call__",
+                    "message": "Creating interrupt with agent_message",
+                    "data": {
+                        "agent_message": state.agent_message,
+                        "msg_to_user_preview": msg_to_user[:100] if msg_to_user else None,
+                        "msg_length": len(msg_to_user) if msg_to_user else 0
+                    },
+                    "timestamp": int(time.time() * 1000)
+                }
+                with open(r"d:\GitHub\000.endcode\base_library\.cursor\debug.log", "a", encoding="utf-8") as f:
+                    f.write(json.dumps(log_data, ensure_ascii=False) + "\n")
+            except Exception:
+                pass
+            # #endregion
 
             # Use interrupt to get input
             interrupt_data = {"message": [msg_to_user]}

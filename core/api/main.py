@@ -272,6 +272,7 @@ async def upload_images(thread_id: str, files: List[UploadFile] = File(...)):
 @app.post("/process", response_model=ProcessResponse)
 async def process_request(
     question: str = Form(..., description="Question or task for processing"),
+    message: Optional[str] = Form(None, description="User message/feedback for HITL continuation"),
     settings: Optional[str] = Form(None, description="JSON processing settings"),
     thread_id: Optional[str] = Form(None, description="Thread ID (optional)"),
     images: Optional[List[UploadFile]] = File(None, description="Images for processing"),
@@ -360,6 +361,17 @@ async def process_request(
 
         logger.info(f"🔍 [core_API] Processing request with user_id: {user_id}")
         
+        # For HITL continuation: use message (user feedback) instead of question (original query)
+        # If message is provided and thread_id exists, it's a continuation - use message
+        # Otherwise, use question for new workflow
+        query_to_use = question
+        if message and thread_id:
+            # This is a continuation of existing workflow - use user's feedback message
+            query_to_use = message
+            logger.info(f"Using message (HITL feedback) for continuation: {message[:100]}...")
+        else:
+            logger.info(f"Using question for new workflow: {question[:100]}...")
+        
         # Build user_settings for Opik trace metadata (without difficulty, subject, volume)
         user_settings = None
         if parsed_settings:
@@ -372,7 +384,7 @@ async def process_request(
         
         result = await graph_manager.process_step(
             thread_id=thread_id or "", 
-            query=question,
+            query=query_to_use,
             image_paths=image_paths,
             wallet_address=None,
             user_id=user_id,

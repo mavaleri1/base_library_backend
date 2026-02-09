@@ -816,9 +816,15 @@ class GraphManager:
             interrupt_data = final_state.interrupts[0].value
             logger.debug(f"Interrupt data: {interrupt_data}")
             msgs = interrupt_data.get("message", [str(interrupt_data)])
+            # #region agent log
+            _debug_log("pre-fix", "D", "graph_manager:_finalize_workflow", "Interrupt received", {"thread_id": thread_id, "interrupt_msgs_count": len(msgs), "first_msg_preview": msgs[0][:200] if msgs else None})
+            # #endregion
 
             # Add unsent URLs to message
             pending_urls = self._get_pending_urls(thread_id)
+            # #region agent log
+            _debug_log("pre-fix", "E", "graph_manager:_finalize_workflow", "Pending URLs check", {"thread_id": thread_id, "pending_urls_count": len(pending_urls), "pending_urls": pending_urls})
+            # #endregion
             if pending_urls:
                 # Place links at the beginning, before agent message
                 msgs = pending_urls + msgs
@@ -826,6 +832,9 @@ class GraphManager:
                 pending_types = list(self.artifacts_data.get(thread_id, {}).get("pending_urls", {}).keys())
                 self._mark_urls_as_sent(thread_id, pending_types)
                 logger.debug(f"Added {len(pending_urls)} pending URLs to interrupt message for thread {thread_id}")
+            # #region agent log
+            _debug_log("pre-fix", "F", "graph_manager:_finalize_workflow", "Final messages after URL merge", {"thread_id": thread_id, "final_msgs_count": len(msgs), "first_msg_preview": msgs[0][:200] if msgs else None})
+            # #endregion
 
             logger.info(f"Workflow interrupted for thread {thread_id}, returning messages: {msgs}")
             session_id = self.artifacts_data.get(thread_id, {}).get("session_id")
@@ -1053,6 +1062,9 @@ class GraphManager:
                     url=url,
                     label="🔄 Concatenation" if not is_edit_node else "✏️ Edited material"
                 )
+                # #region agent log
+                _debug_log("pre-fix", "C", "graph_manager:_save_synthesized_material", "URL tracked for synthesized_material", {"thread_id": thread_id, "is_edit_node": is_edit_node, "url": url, "label": "🔄 Concatenation" if not is_edit_node else "✏️ Edited material", "pending_urls_count": len(self.artifacts_data.get(thread_id, {}).get("pending_urls", {}))})
+                # #endregion
         except Exception as e:
             logger.error(f"Failed to save synthesized material for thread {thread_id}: {e}")
 
