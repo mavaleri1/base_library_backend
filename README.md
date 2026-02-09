@@ -147,8 +147,8 @@ The platform integrates [Opik](https://www.comet.com/docs/opik) for LLM observab
 
 More about Opik:
 
-- [docs/backend/architecture/opik.md](https://github.com/mavaleri1/base_library_backend/blob/main/docs/backend/architecture/opik.md)
-- [docs/architecture/opik-diagrams.md](https://github.com/mavaleri1/base_library_backend/blob/main/docs/architecture/opik-diagrams.md)
+- [opik.md](https://github.com/mavaleri1/base_library_backend/blob/main/docs/backend/architecture/opik.md)
+- [opik-diagrams.md](https://github.com/mavaleri1/base_library_backend/blob/main/docs/architecture/opik-diagrams.md)
 
 ## 🚀 Services Architecture
 
@@ -222,7 +222,7 @@ docker-compose up -d
 
 ```
 
-Env file: [docs/backend/architecture/opik.md](https://github.com/mavaleri1/base_library_backend/blob/main/.env.example)
+Env file: [env.example](https://github.com/mavaleri1/base_library_backend/blob/main/.env.example)
 
 ### Service Health Checks
 
