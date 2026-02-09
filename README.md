@@ -222,6 +222,8 @@ docker-compose up -d
 
 ```
 
+Env file: [docs/backend/architecture/opik.md](https://github.com/mavaleri1/base_library_backend/blob/main/.env.example)
+
 ### Service Health Checks
 
 - **Core**: `http://localhost:8000/health`
