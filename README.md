@@ -3,14 +3,15 @@
 A comprehensive microservices-based platform for generating educational materials using LangGraph workflows, featuring handwritten note recognition, material synthesis, and interactive question generation.
 
 ## Examples of materials
-Beginner
-https://www.base-library.site/materials/1144538a-9925-4a10-aa94-6e96cebe024a
 
-Grade: Intermediate
-https://www.base-library.site/materials/564949bc-015e-42ae-8cf2-c749aa211f9e
+See how the system adjusts the explanation of the same topic: “Explain the fundamentals of probability theory, including permutations, combinations, and conditional probability”
 
-Grade: Advanced
-https://www.base-library.site/materials/703d351d-98a2-4f3e-8775-78f943f7055d
+[Beginner level](https://www.base-library.site/materials/e4a2f3b8-7c7f-4fae-8980-67b063b64f36) — Intuitive explanation using everyday analogies. From real-life intuitive problems to practical use cases.
+
+[Intermediate level](https://www.base-library.site/materials/e707a467-c994-4da2-a0ee-faa27ac69099) — Structural / architectural understanding of the concepts.
+
+[Advanced level](https://www.base-library.site/materials/3f49c8f3-767a-4f8a-b520-a3759a6b5a75) — Academic depth: formal definitions, proofs, rigorous mathematical framework.
+
 
 ## 🏗️ Architecture Overview
 
