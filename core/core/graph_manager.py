@@ -854,7 +854,7 @@ class GraphManager:
         session_id = self.artifacts_data.get(thread_id, {}).get("session_id")
         if session_id:
             base_url = self.settings.web_ui_base_url.rstrip('/')
-            session_url = f"{base_url}/thread/{thread_id}/session/{session_id}"
+            session_url = f"{base_url}/threads/{thread_id}/sessions/{session_id}"
             final_message.append(
                 f"📁 All materials available [here]({session_url})"
             )

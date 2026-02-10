@@ -28,7 +28,8 @@ class EditMaterialNode(BaseWorkflowNode):
 
     def __init__(self, logger: logging.Logger = None):
         super().__init__(logger)
-        self.model = self.create_model()  # Initialize on first call
+        # Don't cache model - create fresh each time to get latest config
+        # self.model = self.create_model()  # Removed to always use fresh config
 
     def get_node_name(self) -> str:
         """Returns node name for configuration"""
@@ -44,8 +45,8 @@ class EditMaterialNode(BaseWorkflowNode):
         return context
 
     def get_model(self):
-        """Returns model for LLM access"""
-        return self.model
+        """Returns model for LLM access - creates fresh model to use latest config"""
+        return self.create_model()
 
     def _normalize_text(self, text: str) -> str:
         """
@@ -454,6 +455,15 @@ class EditMaterialNode(BaseWorkflowNode):
                     },
                 )
 
+        # Direct edit command heuristic (bypass LLM if user gave explicit delete/remove)
+        if messages and isinstance(messages[-1], HumanMessage):
+            direct_edit = self._extract_direct_edit(messages[-1].content)
+            if direct_edit:
+                self.logger.info(
+                    "Direct edit command detected; applying without LLM decision"
+                )
+                return await self.handle_edit_action(state, direct_edit, messages)
+
         # Get personalized prompt from service with additional context
         extra_context = {
             "template_variant": "initial",
@@ -468,9 +478,25 @@ class EditMaterialNode(BaseWorkflowNode):
         model = self.get_model()
         import time
         start_time = time.time()
-        decision = await model.with_structured_output(ActionDecision).ainvoke(
-            [SystemMessage(content=system_prompt)] + messages
-        )
+        try:
+            decision = await model.with_structured_output(ActionDecision).ainvoke(
+                [SystemMessage(content=system_prompt)] + messages
+            )
+        except Exception as e:
+            error_msg = str(e)
+            if "length limit was reached" in error_msg or "max_tokens" in error_msg.lower():
+                self.logger.error(f"Token limit exceeded in edit_material decision: {e}")
+                # Return error message to user
+                return Command(
+                    goto="edit_material",
+                    update={
+                        "feedback_messages": messages,
+                        "needs_user_input": True,
+                        "agent_message": "Response too long. Please try breaking your request into smaller parts or simplify your request.",
+                        "last_action": "token_limit_error",
+                    },
+                )
+            raise
         latency = (time.time() - start_time) * 1000  # ms
 
         # Log LLM call to Opik
@@ -494,9 +520,25 @@ class EditMaterialNode(BaseWorkflowNode):
         # Step 2: Execute action based on type
         if decision.action_type == "edit":
             start_time = time.time()
-            details = await model.with_structured_output(EditDetails).ainvoke(
-                [SystemMessage(content=system_prompt)] + messages
-            )
+            try:
+                details = await model.with_structured_output(EditDetails).ainvoke(
+                    [SystemMessage(content=system_prompt)] + messages
+                )
+            except Exception as e:
+                error_msg = str(e)
+                if "length limit was reached" in error_msg or "max_tokens" in error_msg.lower():
+                    self.logger.error(f"Token limit exceeded in edit_material edit details: {e}")
+                    # Return error message to user
+                    return Command(
+                        goto="edit_material",
+                        update={
+                            "feedback_messages": messages,
+                            "needs_user_input": True,
+                            "agent_message": "Response too long. Please try breaking your edit request into smaller parts.",
+                            "last_action": "token_limit_error",
+                        },
+                    )
+                raise
             latency = (time.time() - start_time) * 1000  # ms
             
             # Log LLM call to Opik
@@ -520,9 +562,25 @@ class EditMaterialNode(BaseWorkflowNode):
 
         elif decision.action_type == "message":
             start_time = time.time()
-            details = await model.with_structured_output(EditMessageDetails).ainvoke(
-                [SystemMessage(content=system_prompt)] + messages
-            )
+            try:
+                details = await model.with_structured_output(EditMessageDetails).ainvoke(
+                    [SystemMessage(content=system_prompt)] + messages
+                )
+            except Exception as e:
+                error_msg = str(e)
+                if "length limit was reached" in error_msg or "max_tokens" in error_msg.lower():
+                    self.logger.error(f"Token limit exceeded in edit_material message details: {e}")
+                    # Return error message to user
+                    return Command(
+                        goto="edit_material",
+                        update={
+                            "feedback_messages": messages,
+                            "needs_user_input": True,
+                            "agent_message": "Response too long. Please try simplifying your message.",
+                            "last_action": "token_limit_error",
+                        },
+                    )
+                raise
             latency = (time.time() - start_time) * 1000  # ms
             
             # Log LLM call to Opik

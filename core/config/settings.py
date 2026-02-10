@@ -125,7 +125,7 @@ class AppSettings(BaseSettings):
 
     # Web UI settings
     web_ui_base_url: str = Field(
-        default="http://127.0.0.1:",
+        default="http://localhost:3001",
         description="Base URL for Web UI interface",
     )
 
