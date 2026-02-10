@@ -48,6 +48,87 @@ class EditMaterialNode(BaseWorkflowNode):
         """Returns model for LLM access - creates fresh model to use latest config"""
         return self.create_model()
 
+    def _check_completion_keywords(self, user_input: str) -> bool:
+        """
+        Check if the user input contains completion keywords.
+        
+        Args:
+            user_input: User input to check
+            
+        Returns:
+            True if completion keywords are found
+        """
+        if not user_input:
+            return False
+        
+        # Normalization: convert to lowercase, remove punctuation and extra spaces
+        normalized = user_input.lower().strip()
+        # Remove punctuation at the end (dots, exclamation marks, etc.)
+        normalized = normalized.rstrip('.,!?;:')
+        # Normalize multiple spaces
+        normalized = re.sub(r'\s+', ' ', normalized).strip()
+        
+        self.logger.debug(f"Checking completion keywords for input: '{user_input}' -> normalized: '{normalized}'")
+        
+        # List of completion keywords
+        completion_keywords = [
+            "ok", "okay", "ок",
+            "don't edit", "dont edit", "no edit", "no editing",
+            "no need", "no need to edit", "no need to change",
+            "no changes", "no change", "no changes needed",
+            "it's fine", "its fine", "it is fine", "fine",
+            "good", "good enough", "looks good",
+            "done", "finished", "complete", "completed",
+            "no", "no thanks", "no thank you",
+            "skip", "skip editing", "skip this",
+            "accept", "accept as is", "keep as is",
+            "that's all", "thats all", "that is all",
+            "nothing", "nothing to change", "nothing to edit",
+            "perfect", "perfect as is",
+            "no modifications", "no modification needed",
+            "proceed", "proceed without editing",
+            "continue", "continue without changes",
+        ]
+        
+        # First check for exact match (most reliable case)
+        if normalized in completion_keywords:
+            self.logger.info(f"Found exact completion keyword match: '{normalized}'")
+            return True
+        
+        # Check for exact match or start/end of string
+        for keyword in completion_keywords:
+            # Exact match (already checked above, but keep for completeness)
+            if normalized == keyword:
+                self.logger.info(f"Found exact completion keyword match: '{keyword}' == '{normalized}'")
+                return True
+            # Start of string with space after
+            if normalized.startswith(keyword + " "):
+                self.logger.info(f"Found completion keyword at start: '{keyword}' in '{normalized}'")
+                return True
+            # End of string with space before
+            if normalized.endswith(" " + keyword):
+                self.logger.info(f"Found completion keyword at end: '{keyword}' in '{normalized}'")
+                return True
+            # Word as a whole (surrounded by spaces)
+            if f" {keyword} " in normalized:
+                self.logger.info(f"Found completion keyword as word: '{keyword}' in '{normalized}'")
+                return True
+        
+        # Check for short answers (1-3 words) that may be agreement
+        words = normalized.split()
+        if len(words) <= 3:
+            # Check for combinations of short agreement words
+            short_completions = ["ok", "okay", "yes", "fine", "good", "done", "no"]
+            if any(word in short_completions for word in words):
+                # If this is only agreement words without indication of editing
+                edit_keywords = ["edit", "change", "modify", "fix", "update", "correct", "improve", "adjust"]
+                if not any(edit_word in normalized for edit_word in edit_keywords):
+                    self.logger.info(f"Found short completion phrase: '{normalized}' (words: {words})")
+                    return True
+        
+        self.logger.debug(f"No completion keywords found in: '{normalized}'")
+        return False
+
     def _normalize_text(self, text: str) -> str:
         """
         Normalize text for comparison:
@@ -443,6 +524,11 @@ class EditMaterialNode(BaseWorkflowNode):
                 if self.security_guard:
                     user_feedback = await self.validate_input(user_feedback)
 
+                # Check for completion keywords BEFORE adding to messages
+                if self._check_completion_keywords(user_feedback):
+                    self.logger.info(f"✅ Completion keywords detected in user input: '{user_feedback}' - skipping edit")
+                    return await self.handle_complete_action(state)
+
                 messages.append(HumanMessage(content=user_feedback))
 
                 # Reset flags and continue processing
@@ -455,14 +541,13 @@ class EditMaterialNode(BaseWorkflowNode):
                     },
                 )
 
-        # Direct edit command heuristic (bypass LLM if user gave explicit delete/remove)
+        # Check for completion keywords in the last message before LLM call
         if messages and isinstance(messages[-1], HumanMessage):
-            direct_edit = self._extract_direct_edit(messages[-1].content)
-            if direct_edit:
-                self.logger.info(
-                    "Direct edit command detected; applying without LLM decision"
-                )
-                return await self.handle_edit_action(state, direct_edit, messages)
+            user_input = messages[-1].content
+            self.logger.debug(f"Checking last message for completion keywords: '{user_input}'")
+            if self._check_completion_keywords(user_input):
+                self.logger.info(f"✅ Completion keywords detected in last message: '{user_input}' - skipping LLM call")
+                return await self.handle_complete_action(state)
 
         # Get personalized prompt from service with additional context
         extra_context = {

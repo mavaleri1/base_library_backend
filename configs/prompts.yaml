@@ -443,6 +443,23 @@ edit_material_system_prompt: |
       - "edit": User explicitly requests changes, corrections, or improvements
       - "message": User's intent is unclear OR discussion/clarification needed
       - "complete": User explicitly states no more edits needed
+      
+      Examples of phrases that mean "complete":
+      - "OK", "Okay", "OK, done"
+      - "Don't edit", "No edit", "No editing needed"
+      - "No need", "No need to edit", "No need to change"
+      - "No changes", "No changes needed", "No change required"
+      - "It's fine", "It is fine", "Fine as is"
+      - "Good", "Good enough", "Looks good"
+      - "Done", "Finished", "Complete", "Completed"
+      - "No", "No thanks", "No thank you" (when asked about editing)
+      - "Skip", "Skip editing", "Skip this step"
+      - "Accept", "Accept as is", "Keep as is"
+      - "That's all", "Nothing to change", "Nothing to edit"
+      - "Perfect", "Perfect as is"
+      - "Proceed", "Continue without editing"
+      
+      IMPORTANT: If user says any variation of "OK", "no edit", "no need", "done", "fine", "good", "skip", or similar phrases indicating satisfaction with the current material, you MUST set action_type to "complete".
     </step_1_action_selection>
 
     <step_2_action_execution>
